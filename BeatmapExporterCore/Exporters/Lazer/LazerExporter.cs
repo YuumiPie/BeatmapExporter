@@ -204,6 +204,33 @@ namespace BeatmapExporterCore.Exporters.Lazer
             }
         }
         
+        /// <summary>
+        /// Export a single BeatmapSet's lastUpdated data and its Beatmap's lastPlayed data, with only the 'selected' diffs 
+        /// </summary>
+        /// <param name="mapset">The BeatmapSet data to export</param>
+        /// <exception cref="IOException">The BeatmapSet data export was unsuccessful and an error should be noted to the user.</exception>
+        public void ExportBeatmapSetsData(List<BeatmapSet> beatmapSets)
+        {
+            Dictionary<int, DateTimeOffset> dateAdded = new();
+            Dictionary<int, DateTimeOffset?> lastPlayed = new();
+            foreach (BeatmapSet mapset in beatmapSets)
+            {
+                dateAdded[mapset.OnlineID] = mapset.DateAdded;
+                foreach (Beatmap beatmap in mapset.Beatmaps)
+                {
+                    if (beatmap.LastPlayed is null)
+                    {
+                        continue;
+                    }
+                    lastPlayed[beatmap.OnlineID] = beatmap.LastPlayed;
+                }
+            }
+            File.WriteAllLines(Path.Combine(Configuration.FullPath, "DateAdded.txt"), dateAdded
+                .Select(x => $"{x.Key} {x.Value:yyyy-MM-ddTHH:mm:ss.fffZ}"));
+            File.WriteAllLines(Path.Combine(Configuration.FullPath, "LastPlayed.txt"), lastPlayed
+                .Select(x => $"{x.Key} {x.Value:yyyy-MM-ddTHH:mm:ss.fffZ}"));
+        }
+        
         public record struct AudioExportTask(BeatmapSet OriginSet, BeatmapMetadata AudioFile, string? TranscodeFrom, string OutputFilename);
 
         /// <summary>

@@ -26,6 +26,7 @@ namespace BeatmapExporterCLI.Interface
             int attempted = 0, exported = 0;
             int count = Exporter.SelectedBeatmapSetCount;
             Console.WriteLine($"Selected {Exporter.SelectedBeatmapSetCount} beatmap sets for export.");
+            Exporter.ExportBeatmapSetsData(Exporter.SelectedBeatmapSets);
             foreach (var mapset in Exporter.SelectedBeatmapSets)
             {
                 string? filename = null;
